@@ -1,8 +1,11 @@
 document.addEventListener("DOMContentLoaded", () => {
   const activitiesList = document.getElementById("activities-list");
-  const activitySelect = document.getElementById("activity");
   const signupForm = document.getElementById("signup-form");
   const messageDiv = document.getElementById("message");
+  const signupModal = document.getElementById("signup-modal");
+  const closeModal = document.querySelector(".close-modal");
+  const modalActivityName = document.getElementById("modal-activity-name");
+  const activityInput = document.getElementById("activity");
 
   // Function to fetch activities from API
   async function fetchActivities() {
@@ -45,20 +48,20 @@ document.addEventListener("DOMContentLoaded", () => {
           <div class="participants-container">
             ${participantsHTML}
           </div>
+          <button class="register-btn" data-activity="${name}">Register Student</button>
         `;
 
         activitiesList.appendChild(activityCard);
-
-        // Add option to select dropdown
-        const option = document.createElement("option");
-        option.value = name;
-        option.textContent = name;
-        activitySelect.appendChild(option);
       });
 
       // Add event listeners to delete buttons
       document.querySelectorAll(".delete-btn").forEach((button) => {
         button.addEventListener("click", handleUnregister);
+      });
+
+      // Add event listeners to register buttons
+      document.querySelectorAll(".register-btn").forEach((button) => {
+        button.addEventListener("click", openRegistrationModal);
       });
     } catch (error) {
       activitiesList.innerHTML =
@@ -66,6 +69,31 @@ document.addEventListener("DOMContentLoaded", () => {
       console.error("Error fetching activities:", error);
     }
   }
+
+  // Open registration modal
+  function openRegistrationModal(event) {
+    const activityName = event.target.getAttribute("data-activity");
+    modalActivityName.textContent = activityName;
+    activityInput.value = activityName;
+    signupModal.classList.remove("hidden");
+    messageDiv.classList.add("hidden");
+  }
+
+  // Close modal
+  closeModal.addEventListener("click", () => {
+    signupModal.classList.add("hidden");
+    signupForm.reset();
+    messageDiv.classList.add("hidden");
+  });
+
+  // Close modal when clicking outside
+  window.addEventListener("click", (event) => {
+    if (event.target === signupModal) {
+      signupModal.classList.add("hidden");
+      signupForm.reset();
+      messageDiv.classList.add("hidden");
+    }
+  });
 
   // Handle unregister functionality
   async function handleUnregister(event) {
